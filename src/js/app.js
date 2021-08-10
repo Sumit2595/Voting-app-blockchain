@@ -74,12 +74,13 @@ App = {
       return electionInstance.candidatesCount();
     }).then(function(candidatesCount) {
       var candidatesResults = $("#candidatesResults");
+      //console.log(candidatesResults);
       candidatesResults.empty();
 
       var candidatesSelect = $('#candidatesSelect');
       candidatesSelect.empty();
 
-      for (var i = 1; i <= candidatesCount; i++) {
+      for (var i = 1; i <=candidatesCount; i++) {
         electionInstance.candidates(i).then(function(candidate) {
           var id = candidate[0];
           var name = candidate[1];
@@ -92,6 +93,21 @@ App = {
           // Render candidate ballot option
           var candidateOption = "<option value='" + id + "' >" + name + "</ option>"
           candidatesSelect.append(candidateOption);
+          var seen = {};
+         $('table tr').each(function() {
+            var txt = $(this).text();
+            if (seen[txt])
+           $(this).remove();
+           else
+           seen[txt] = true;       
+          });   
+          var map = {};
+        $('select option').each(function () {
+          if (map[this.value]) {
+        $(this).remove()
+         }
+           map[this.value] = true;
+           })
         });
       }
       return electionInstance.voters(App.account);
@@ -106,7 +122,6 @@ App = {
       console.warn(error);
     });
   },
-
   castVote: function() {
     var candidateId = $('#candidatesSelect').val();
     App.contracts.Election.deployed().then(function(instance) {
